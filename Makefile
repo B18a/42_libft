@@ -1,8 +1,16 @@
-NAME = libft.a
-FLAGS = -Wall -Werror -Wextra
-CC = cc
-REMOVE = rm -f
+NAME		= libft.a
+CFLAGS		= -Wall -Werror -Wextra
+CC			= cc
+REMOVE		= rm -rf
+OBJ_DIR		= ./obj
+SRC_DIR		= src
+INC_DIR		=
 
+# looking for files in subdirectories
+vpath %.c $(SRC_DIR)
+vpath %.h $(INC_DIR)
+
+# INTERNAL FUNCTIONS
 FUNCTIONS = ft_isalpha.c \
 			ft_isdigit.c \
 			ft_isalnum.c \
@@ -38,8 +46,10 @@ FUNCTIONS = ft_isalpha.c \
 			ft_strmapi.c \
 			ft_striteri.c
 
-OBJECTS = ${FUNCTIONS:.c=.o}
+# INTERNAL OBJECT
+OBJECTS		= $(addprefix $(OBJ_DIR)/, $(notdir $(FUNCTIONS:.c=.o)))
 
+# # INTERNAL BONUS FUNCTIONS
 BFUNCTIONS =	ft_lstnew.c \
 				ft_lstadd_front.c \
 				ft_lstsize.c \
@@ -50,29 +60,34 @@ BFUNCTIONS =	ft_lstnew.c \
 				ft_lstiter.c \
 				ft_lstmap.c
 
-BOBJECTS = ${BFUNCTIONS:.c=.o}
+# INTERNAL BONUS OBJECT
+BOBJECTS		= $(addprefix $(OBJ_DIR)/, $(notdir $(BFUNCTIONS:.c=.o)))
 
 all : $(NAME)
 
+# INTERNAL RULE
 $(NAME) : $(OBJECTS)
 	ar rcs $(NAME) $(OBJECTS)
 
-$(OBJECTS): $(FUNCTIONS)
-	$(CC) $(FLAGS) -c $(FUNCTIONS)
-
+# INTERNAL BONUS RULE
 bonus : $(OBJECTS) $(BOBJECTS)
 	ar rcs $(NAME) $(OBJECTS) $(BOBJECTS)
 
-$(BOBJECTS): $(BFUNCTIONS)
-	$(CC) $(FLAGS) -c $(BFUNCTIONS)
+# DIRECTORY
+$(OBJ_DIR):
+	mkdir $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean :
 		$(REMOVE) $(OBJECTS) $(BOBJECTS)
+		$(REMOVE) $(OBJ_DIR)
 
 fclean : clean
 		$(REMOVE) $(NAME)
+		$(REMOVE) $(OBJ_DIR)
 
 re : fclean
-		$(MAKE) all
 
 .PHONY : all, bonus, clean, fclean, re
